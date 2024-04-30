@@ -1,0 +1,5 @@
+/home/jovyan/CSPB-2270_Spring_2024/Tries-Project/build/CMakeFiles/run_tests.dir
+/home/jovyan/CSPB-2270_Spring_2024/Tries-Project/build/CMakeFiles/run_app.dir
+/home/jovyan/CSPB-2270_Spring_2024/Tries-Project/build/CMakeFiles/test.dir
+/home/jovyan/CSPB-2270_Spring_2024/Tries-Project/build/CMakeFiles/edit_cache.dir
+/home/jovyan/CSPB-2270_Spring_2024/Tries-Project/build/CMakeFiles/rebuild_cache.dir
