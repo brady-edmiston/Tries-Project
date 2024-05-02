@@ -61,114 +61,185 @@ protected:
 double test_Trie::total_grade = 0;
 double test_Trie::max_grade = 38;
 
+/* Helper function to return a trie structure
+by giving the pointer to the root node
+                 ""
+                /  \
+               c     a
+              / \      \
+             o   a      s
+            /    |      
+           o     t
+           |     |
+           p     c
+                 |
+                 h
+*/
+node* helper_build_trie() {
+  // Nodes
+  node* root_node = new node;
+  root_node->value = "";
+  node* _c = new node;
+  _c->value = "c";
+  node* co = new node;
+  co->value = "co";
+  node* coo = new node;
+  coo->value = "coo";
+  node* coop = new node;
+  coop->value = "coop";
+  node* ca = new node;
+  ca->value = "ca";
+  node* cat = new node;
+  cat->value = "cat";
+  node* catc = new node;
+  catc->value = "catc";
+  node* _catch = new node; // catch is reserved
+  _catch->value = "catch";
+  node* _a = new node;
+  _a->value = "a";
+  node* _as = new node;
+  _as->value = "as";
+
+  // Links
+  trie_link* c_link = new trie_link;
+  c_link->value = 'c';
+  trie_link* o1_link = new trie_link;
+  o1_link->value = 'o';
+  trie_link* o2_link = new trie_link;
+  o2_link->value = 'o';
+  trie_link* p_link = new trie_link;
+  p_link->value = 'p';
+  trie_link* a1_link = new trie_link;
+  a1_link->value = 'a';
+  trie_link* t_link = new trie_link;
+  t_link->value = 't';
+  trie_link* c2_link = new trie_link;
+  c2_link->value = 'c';
+  trie_link* h_link = new trie_link;
+  h_link->value = 'h';
+  trie_link* a2_link = new trie_link;
+  a2_link->value = 'a';
+  trie_link* s_link = new trie_link;
+  s_link->value = 's';
+
+  // Now build up the trie structure
+  root_node->links.push_back(c_link);
+  c_link->next_node = _c;
+  _c->links.push_back(o1_link);
+  o1_link->next_node = co;
+  co->links.push_back(o2_link);
+  o2_link->next_node = coo;
+  coo->links.push_back(p_link);
+  p_link->next_node = coop;
+
+  _c->links.push_back(a1_link);
+  a1_link->next_node = ca;
+  ca->links.push_back(t_link);
+  t_link->next_node = cat;
+  cat->links.push_back(c2_link);
+  c2_link->next_node = catc;
+  catc->links.push_back(h_link);
+  h_link->next_node = _catch;
+
+  root_node->links.push_back(a2_link);
+  a2_link->next_node = _a;
+  _a->links.push_back(s_link);
+  s_link->next_node = _as;
+
+  return root_node;
+}
+
+
 TEST_F(test_Trie, TestInitialization) {
-  // LinkedList mylist;
-  // ASSERT_FALSE(mylist.get_top()); // expect top to be NULL
-  // add_points_to_grade(1);
-  // node* root = mylist.init_node(42);
-  // ASSERT_TRUE(root); // expect root itself to have a pointer (not NULL)
-  // add_points_to_grade(1);
-  // ASSERT_EQ(42, root->data);
-  // add_points_to_grade(1);
-  // ASSERT_FALSE(root->next); // expect next pointer to be null
-  // add_points_to_grade(1);
+  Trie mytrie;
+  // Expect root node to exist and be empty string
+  node* root_node = mytrie.get_root();
+  ASSERT_EQ("", root_node->value);
+  ASSERT_TRUE(root_node->links.empty());
+  //Expect size to be 0 
+  ASSERT_EQ(0, mytrie.get_size());
 }
 
 TEST_F(test_Trie, TestInsert) {
-  // LinkedList mylist;
-  // node* top = build_three_node_list_helper(42, 74, 51);
-  // mylist.set_top(top);
-  // mylist.append_data(10);
+  Trie mytrie;
+  node* root_node = helper_build_trie();
+  mytrie.set_root_node(root_node);
+  node* c_ursor = mytrie.get_root()->links[1]->next_node->links[0]->next_node; // go to node "as"
+  ASSERT_FALSE(c_ursor->links.empty()); // Make sure links vector isn't empty
+  trie_link* v_ursor = c_ursor->links[0];
+  ASSERT_TRUE(v_ursor->next_node); // Make sure next node is populated
+  ASSERT_EQ(v_ursor->value, 'h'); // Should have value of 'h'
 
-  // // get a cursor for appended data
-  // node* cursor = mylist.get_top()->next->next->next;
-  // ASSERT_TRUE(cursor);
-  // add_points_to_grade(1);
+  c_ursor = c_ursor->links[0]->next_node; // Go to node "ash"
+  ASSERT_TRUE(c_ursor->links.empty()); // Make sure links vector is now empty, we should be at a leaf!
+  ASSERT_EQ(c_ursor->value, "ash"); // Should have value of "ash"
 
-  // ASSERT_FALSE(cursor->next); // expect to be NULL
-  // add_points_to_grade(1);
+  mytrie.insert("coat");
+  c_ursor = mytrie.get_root()->links[0]->next_node->links[0]->next_node; // go to node "co"
+  ASSERT_FALSE(c_ursor->links.empty()); // Make sure links vector isn't empty
+  v_ursor = c_ursor->links[1];
+  ASSERT_TRUE(v_ursor->next_node); // Make sure next node is populated
+  ASSERT_EQ(v_ursor->value, 'a'); // Should have value of 'a'
 
-  // ASSERT_EQ(10, cursor->data);
-  // add_points_to_grade(1);
+  c_ursor = c_ursor->links[0]->next_node; // go to node "coa"
+  ASSERT_EQ(c_ursor->value, "coa"); // should have value of "coa"
+  ASSERT_FALSE(c_ursor->links.empty()); // Make sure links vector isn't empty
+  v_ursor = c_ursor->links[0];
+  ASSERT_TRUE(v_ursor->next_node); // Make sure next node is populated
+  ASSERT_EQ(v_ursor->value, 't'); // Should have value of 't'
 
-  // // try appending one more node
-  // mylist.append_data(102);
-  // // update cursor to point to fifth member
-  // cursor = mylist.get_top()->next->next->next->next;
-  // ASSERT_TRUE(cursor); // expect not to be NULL
-  // add_points_to_grade(1);
+  c_ursor = c_ursor->links[0]->next_node; // go to node "coat"
+  ASSERT_TRUE(c_ursor->links.empty()); // Make sure links vector is now empty, we should be at a leaf!
+  ASSERT_EQ(c_ursor->value, "coat"); // Should have value of "coat"
 
-  // ASSERT_FALSE(cursor->next); // expect to be NULL
-  // add_points_to_grade(1);
-
-  // ASSERT_EQ(102, cursor->data);
-  // add_points_to_grade(1);
 }
 
 
 TEST_F(test_Trie, TestRemove) {
-  // LinkedList mylist;
+  Trie mytrie;
+  node* root_node = helper_build_trie();
+  mytrie.set_root_node(root_node);
+  bool result = mytrie.remove("yellow");
+  ASSERT_FALSE(result);
+  result = mytrie.remove("coop");
+  ASSERT_TRUE(result);
+  node* c_ursor = mytrie.get_root()->links[0]->next_node; // go to node "c"
+  ASSERT_EQ(1, c_ursor->links.size()); // Links should only have 'a'
 
-  // node* threenode = build_three_node_list_helper(7, 86, 210);
-  // mylist.set_top(threenode);
+  result = mytrie.remove("cat");
+  ASSERT_FALSE(result);
 
-  // int vals[] = {7, 86, 210};
-  // ASSERT_TRUE(expect_all_helper(vals, 3, mylist.get_top()));
-
-  // // remove start
-  // mylist.remove(0);
-  // int vals2[] = {86, 210};
-  // ASSERT_TRUE(expect_all_helper(vals2, 2, mylist.get_top()));
-  // add_points_to_grade(1);
-
-  // // reset and remove mid
-  // threenode = build_three_node_list_helper(7, 86, 210);
-  // mylist.set_top(threenode);
-  // mylist.remove(1);
-  // int vals3[] = {7, 210};
-  // ASSERT_TRUE(expect_all_helper(vals3, 2, mylist.get_top()));
-  // add_points_to_grade(1);
-
-  // // reset and remove end
-  // threenode = build_three_node_list_helper(7, 86, 210);
-  // mylist.set_top(threenode);
-  // mylist.remove(2);
-  // int vals4[] = {7, 86};
-  // ASSERT_TRUE(expect_all_helper(vals4, 2, mylist.get_top()));
-  // add_points_to_grade(1);
-
-  // // reset and remove beyond list
-  // threenode = build_three_node_list_helper(7, 86, 210);
-  // mylist.set_top(threenode);
-  // mylist.remove(3);
-  // int vals5[] = {7, 86, 210};
-  // ASSERT_TRUE(expect_all_helper(vals5, 3, mylist.get_top()));
 }
 
 TEST_F(test_Trie, TestSize) {
-  // LinkedList mylist;
-  // ASSERT_EQ(0, mylist.size());
-  // add_points_to_grade(2);
+  Trie mytrie;
+  node* root_node = helper_build_trie();
+  mytrie.set_root_node(root_node);
+  int result = mytrie.get_size();
+  ASSERT_EQ(result, 4);
 
-  // node* threenode = build_three_node_list_helper(76, 12, 423);
-  // mylist.set_top(threenode);
-  // ASSERT_EQ(3, mylist.size());
-  // add_points_to_grade(2);
+  mytrie.insert("yell");
+  result = mytrie.get_size();
+  ASSERT_EQ(result, 5);
+
+  mytrie.remove("cat");
+  result = mytrie.get_size();
+  ASSERT_EQ(result, 4);
 }
 
 TEST_F(test_Trie, TestContains) {
-  // LinkedList mylist;
-  // node* threenode = build_three_node_list_helper(7, 0, -210);
-  // mylist.set_top(threenode);
+  Trie mytrie;
+  node* root_node = helper_build_trie();
+  mytrie.set_root_node(root_node);
 
-  // ASSERT_TRUE(mylist.contains(-210));
-  // add_points_to_grade(0.8);
-  // ASSERT_TRUE(mylist.contains(0));
-  // add_points_to_grade(0.8);
-  // ASSERT_TRUE(mylist.contains(7));
-  // add_points_to_grade(0.8);
-  // ASSERT_FALSE(mylist.contains(12));
-  // add_points_to_grade(0.8);
-  // ASSERT_FALSE(mylist.contains(-120));
-  // add_points_to_grade(0.8);
+  bool result = mytrie.contains("coop");
+  ASSERT_TRUE(result);
+
+  mytrie.remove("as");
+  result = mytrie.contains("as");
+  ASSERT_FALSE(result);
+
+  mytrie.insert("thigh");
+  result = mytrie.contains("thigh");
+  ASSERT_TRUE(result);
 }
