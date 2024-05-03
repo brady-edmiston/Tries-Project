@@ -4,19 +4,15 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
 struct trie_link;
 
 struct node {
-  vector<trie_link*> links;
-  string value;
-};
-
-struct trie_link {
-  node* next_node = nullptr;
-  char value;
+  map<char, node*> children;
+  bool end_of_word; // is this an actual entry
 };
 
 // Linked List Invariant: following the 'next' links must eventually lead to a
@@ -34,7 +30,7 @@ public:
   bool contains(string word);
   // If the word is in the trie, its node is deleted along with any hanging links as a result
   // and true is returned. Otherwise, false is returned.
-  bool remove(string word);
+  bool remove(const string& word);
   // Returns the number of nodes in the trie. Does not count the root node ''.
   int get_size();
   // Returns the value of the root node
@@ -47,12 +43,8 @@ private:
   node* root_ptr;
   // number of nodes in the trie.
   int size;
-  // Initialzes a node with a nullptr in links and the word value.
-  node* init_node(string word);
-  // Initializes a link with the char value.
-  trie_link* init_link(char value);
-  // Inserts a given node into the trie.
-  void insert_node(node* new_node);
+  // helper recursive remove
+  bool remove_helper(node* current, const string& word, int depth);
 };
 
 #endif // TRIE_H_

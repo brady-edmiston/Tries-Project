@@ -11,8 +11,7 @@
 
 // Constructor
 Trie::Trie() {
-    node* new_root = init_node("");
-    this->root_ptr = new_root;
+    this->root_ptr = new node;
     this->size = 0;
 };
 
@@ -21,17 +20,32 @@ Trie::~Trie() {};
 
 
 void Trie::insert(string word) {
-    return;
+    node* n_cursor = this->root_ptr;
+    for (char ch : word) {
+        if (n_cursor->children.find(ch) == n_cursor->children.end()) {
+            n_cursor->children[ch] = new node();
+        }
+        n_cursor = n_cursor->children[ch];
+    }
+    n_cursor->end_of_word = true;
+    this->size++;
 };
 
 
 bool Trie::contains(string word) {
-    return false;
-};
+    node* current = this->root_ptr;
+    for (char ch : word) {
+        if (current->children.find(ch) == current->children.end()) {
+            return false;
+        }
+        current = current->children[ch];
+    }
+    return current != nullptr && current->end_of_word;
+}
 
 
-bool Trie::remove(string word) {
-    return false;
+bool Trie::remove(const string& word) {
+    return this->remove_helper(this->root_ptr, word, 0);
 };
 
 
@@ -41,25 +55,36 @@ node* Trie::get_root() {
 
 
 int Trie::get_size() {
-    return 0;
-};
+    return this->size;
+}
 
+// Helper function for removing a word from the trie
+bool Trie::remove_helper(node* current, const string& word, int depth) {
+    // base case: we're past the length of the word
+    if (depth == word.length()) {
+        if (!current->end_of_word) {
+            return false;
+        }
+        current->end_of_word = false;
+        this->size--;
+        return current->children.empty();
+    }
 
-node* Trie::init_node(string word) {
-    node* new_node = new node;
-    new_node->value = word;
-    return new_node;
-};
+    char ch = word[depth];
+    // base case: next node is null (we're at a leaf node)
+    if (current->children.find(ch) == current->children.end()) {
+        return false;
+    }
 
+    bool delete_current_node = remove_helper(current->children[ch], word, depth + 1);
+    // base case: we've found the node to delete
+    if (delete_current_node) {
+        delete current->children[ch];
+        current->children.erase(ch);
+        return current->children.empty();
+    }
 
-trie_link* Trie::init_link(char value) {
-    trie_link* new_link = new trie_link;
-    new_link->value = value;
-    return new_link;
-};
-
-
-void Trie::insert_node(node* new_node) {
-    return;
-};
+    // Base case: recursion exited without finding 
+    return false;
+}
 
