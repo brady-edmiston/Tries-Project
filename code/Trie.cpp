@@ -71,7 +71,7 @@ bool Trie::remove_helper(node* current, const string& word, int depth) {
     }
 
     char ch = word[depth];
-    // base case: next node is null (we're at a leaf node)
+    // base case: next char isn't in trie
     if (current->children.find(ch) == current->children.end()) {
         return false;
     }
